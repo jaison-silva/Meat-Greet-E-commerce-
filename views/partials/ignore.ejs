@@ -1,0 +1,12 @@
+<% for(var i=0;i<variable.length;i++){ %>
+
+    <tr>
+        <td><%= variable[i].name %></td>
+        <td><%= variable[i].email %></td>
+        <td>
+            <a class="delete-button" href="/api/delete/<%= variable[i]._id %>">Delete</a>
+            <a class="update-button" href="/api/update_user/<%= variable[i]._id %>">Update</a>
+        </td>
+    </tr>
+
+<% } %>
