@@ -4,15 +4,14 @@ const controller = require('../controllers/controller')
 
 route.get('/signup', controller.signup)
 
-route.get('/admin', controller.admin)
+route.get('/login', controller.login)
+
+
+/////user side 
 
 route.get('/', controller.index)
 
-route.get('/addcategory', controller.addcategory)
-
-route.get('/addproducts', controller.addproducts)
-
-route.get('/login', controller.login)
+// route.post('/upload',controller.upload)
 
 route.get('/category', controller.category)
 
@@ -20,7 +19,20 @@ route.get('/products', controller.products)
 
 route.get('/category/products/:id?', controller.cate_products)   //// question mark aded
 
-// route.post('/upload',controller.upload)
+
+
+//////admin side 
+
+route.get('/admin', controller.admin)
+
+route.get('/adminCategory', controller.adminCategory)
+
+route.get('/adminProducts', controller.adminProducts)
+
+route.get('/admincategory', controller.adminCategory)
+
+route.get('/addproducts', controller.addproducts)
+
 
 // Api routes
 

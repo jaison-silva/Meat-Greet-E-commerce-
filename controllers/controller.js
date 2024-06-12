@@ -1,22 +1,31 @@
 const { Product, Category } = require('../models/model')
 
-module.exports.signup = (req, res) => {
+exports.signup = (req, res) => {
     res.render('signup')
 }
 
-module.exports.admin = (req, res) => {
-    res.render('admin')
+exports.admin = (req, res) => {
+    res.send("asdofas;doifh")
+    // res.render('admin')
 }
 
-module.exports.addcategory = (req, res) => {
-    res.render('addcategory')
+exports.adminCategory = (req, res) => {
+    res.render('admin/adminCategory')
 }
 
-module.exports.index = (req, res) => {
+exports.adminProducts = (req, res) => {
+    res.render('admin/adminProducts')
+}
+
+exports.addcategory = (req, res) => {
+    res.render('adminCategory')
+}
+
+exports.index = (req, res) => {
     res.render('index')
 }
 
-module.exports.addproducts = async (req, res) => {
+exports.addproducts = async (req, res) => {
     try{
         const data = await Category.find({}).select('name');
         console.log(data)
@@ -26,11 +35,11 @@ module.exports.addproducts = async (req, res) => {
         }
 }
 
-module.exports.login = (req, res) => {
+exports.login = (req, res) => {
     res.render('login')
 }
 
-module.exports.category = async (req, res) => {
+exports.category = async (req, res) => {
     try{
         const data = await Category.find()
         res.render('category', { data })}catch(err){
@@ -39,7 +48,7 @@ module.exports.category = async (req, res) => {
         }
 }
 
-module.exports.products = async (req, res) => {
+exports.products = async (req, res) => {
     try{
         const data = await Product.find().populate('category')
         console.log(data);
@@ -50,7 +59,7 @@ module.exports.products = async (req, res) => {
     }
 }
 
-module.exports.cate_products = async (req, res) => {
+exports.cate_products = async (req, res) => {
     try{
         const data = await Product.find({category:req.params.id}).populate('category')
         res.render('products',{data})}catch(err){
@@ -59,7 +68,7 @@ module.exports.cate_products = async (req, res) => {
         }
 }
 
-// module.exports.upload =  (req, res, next) => {
+// exports.upload =  (req, res, next) => {
 //     // res.render('login.ejs')
 //     let { name, age } = req.body
 
@@ -80,7 +89,7 @@ module.exports.cate_products = async (req, res) => {
 // }
 
 
-module.exports.addProducts = (req, res) => {
+exports.addProducts = (req, res) => {
     try{
         let { name, description, rating, rate ,category} = req.body
         const data = new Product({ name, description, rating, rate, category})
@@ -99,7 +108,7 @@ module.exports.addProducts = (req, res) => {
             }
 }
 
-module.exports.addCategory = (req, res) => {
+exports.addCategory = (req, res) => {
     try{
         let { name, description, rate } = req.body
     
