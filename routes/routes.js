@@ -18,7 +18,7 @@ route.get('/category', controller.category)
 
 route.get('/products', controller.products)
 
-route.get('/category/products/:id', controller.cate_products)
+route.get('/category/products/:id?', controller.cate_products)   //// question mark aded
 
 // route.post('/upload',controller.upload)
 

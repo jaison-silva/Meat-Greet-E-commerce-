@@ -20,9 +20,6 @@ async function serverOn() {
     try {
         await mongoose.connect('mongodb://localhost:27017/Meat&Greet')
         console.log("db connected")
-        app.listen(process.env.PORT || 9999, () => {
-            console.log("server running at http://localhost:3000")
-        })
     }catch(error){
         console.log(`failed to start the server. ${error}`)
     }
@@ -36,3 +33,7 @@ app.use('/',(req, res, next) => {
 });
 
 app.use('/',route)
+
+app.listen(process.env.PORT || 9999, () => {
+    console.log("server running at http://localhost:3000")
+})
