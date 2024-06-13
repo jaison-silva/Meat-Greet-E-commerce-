@@ -5,20 +5,44 @@ exports.signup = (req, res) => {
 }
 
 exports.admin = (req, res) => {
-    res.send("asdofas;doifh")
-    // res.render('admin')
+    res.render('admin')
 }
 
-exports.adminCategory = (req, res) => {
-    res.render('admin/adminCategory')
+exports.adminCategory = async (req, res) => {
+    try{
+        const data = await Product.find().populate('category')
+        console.log(data);
+        res.render('admin/adminCategory',{data})
+    }catch(err){
+        console.log(err)
+        res.status(500).send(err)
+    }
 }
 
-exports.adminProducts = (req, res) => {
-    res.render('admin/adminProducts')
+exports.manageUsers = async (req, res) => {
+    try{
+        const data = await Product.find().populate('category')
+        console.log(data);
+        res.render('admin/manageUsers',{data})
+    }catch(err){
+        console.log(err)
+        res.status(500).send(err)
+    }
+}
+
+exports.adminProducts = async (req, res) => {
+    try{
+        const data = await Product.find().populate('category')
+        console.log(data);
+        res.render('admin/adminProducts',{data})
+    }catch(err){
+        console.log(err)
+        res.status(500).send(err)
+    }
 }
 
 exports.addcategory = (req, res) => {
-    res.render('adminCategory')
+    res.render('addCategory')
 }
 
 exports.index = (req, res) => {
@@ -66,6 +90,16 @@ exports.cate_products = async (req, res) => {
             console.log(err)
             res.status(500).send(err)
         }
+}
+
+exports.productDetailed = async (req,res) =>{
+    try{
+        // const data = Product.find({Category:req.params.id})
+        res.render('productDetailed')
+    }catch(err){
+        console.log(err)
+        res.status(500).send(err)
+    }
 }
 
 // exports.upload =  (req, res, next) => {

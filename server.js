@@ -18,7 +18,7 @@ app.use('/assets', express.static(path.join(__dirname, '/assets')))
 
 async function serverOn() {
     try {
-        await mongoose.connect('mongodb://localhost:27017/Meat&Greet')
+        await mongoose.connect(process.env.MONGO_URI ||'mongodb://localhost:27017/Meat&Greet')
         console.log("db connected")
     }catch(error){
         console.log(`failed to start the server. ${error}`)
@@ -28,7 +28,7 @@ async function serverOn() {
 serverOn()
 
 app.use('/',(req, res, next) => {
-    console.log(`Request received method : ${req.method} and route : ${req.url}`);
+    console.log(`Request received method : ${req.method} and route : ${req.originalUrl}`);
     next(); // Pass control to the next middleware
 });
 
