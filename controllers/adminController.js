@@ -1,51 +1,61 @@
-const cookieParser = require('cookie-parser')
 const { Product, Category } = require('../models/model')
 const userModel = require('../models/userModel')
-const adminModel = require('../models/adminModel')
-const nodemailer = require('nodemailer')
+const {adminModel} = require('../models/adminModel')
 const jwt = require('jsonwebtoken')
-const { computeStyles } = require('@popperjs/core')
-const { render } = require('ejs')
 
 
 exports.adminLogin = (req,res)=>{
-    render('adminLogin')
+    res.render('admin/adminLogin')
 }
 
-exports.adminCheck = async (req, res) => {
-    let {email, password} = req.body
-    const admin = await adminModel.findOne({email: email})
-    console.log(admin)
+exports.login = async (req, res) => {
     try {
-        if(admin.email == email && admin.password == password){
-        
-            const token = {
-                email : email
-            }
-            
-            const adminToken = jwt.sign(token, "secret_key",{
-                expiresIn: '4h'
-            })
-    
-            res.cookie('adminJwtAuth', adminToken,{
+        let { email, password } = req.body;
+        console.log("Login triggered with:", email, password);
+
+        // Find admin by email
+        const admin = await adminModel.findOne({ email: email });
+        console.log("Admin found:", admin);
+
+        // Check if admin exists and passwords match
+        if (admin && password === admin.password) {       //// confused with admin === admin.password since admin is an object
+            console.log("Admin verified!");
+
+            // Create a JWT token
+            const token = { email: email };
+            const adminToken = jwt.sign(token, "secret_key", { expiresIn: '4h' });
+
+            // Set the JWT as a cookie
+            res.cookie('adminJwtAuth', adminToken, {
                 httpOnly: true,
                 maxAge: 4 * 60 * 60 * 1000 // 4 hours in milliseconds
-            })
-    
-            res.redirect('/')
-        }else{
-            res.render('adminLogin')
+            });
+
+            // Redirect to admin dashboard
+            res.redirect('/?msg=success');
+        } else {
+            // Invalid credentials, re-render login page
+            res.redirect('/admin/adminLogin/?msg=invalid');
         }
     } catch (err) {
-        console.log(err)
-        res.status(500).send(err)
+        console.log("Error during login:", err);
+        res.status(500).send(err);
     }
-    
+};
+
+exports.logout = (req,res) => {
+    try{
+        res.clearCookie("adminJwtAuth");
+        res.redirect('/?msg=loggedout');
+    }catch(e){
+        console.log(e);
+        res.status(500).send("Error");
+    }
 }
 
 exports.adminCategory = async (req, res) => {
     try {
-        const data = await Product.find().populate('category')
+        const data = await Category.find({})
         console.log(data);
         res.render('admin/adminCategory', { data })
     } catch (err) {
@@ -56,13 +66,42 @@ exports.adminCategory = async (req, res) => {
 
 exports.manageUsers = async (req, res) => {
     try {
-        const data = await Product.find().populate('category')
-        console.log(data);
+        const data = await userModel.find({})
+        // console.log(data);
         res.render('admin/manageUsers', { data })
     } catch (err) {
         console.log(err)
         res.status(500).send(err)
     }
+}
+
+exports.toggleUser = async(req,res) => {
+    const userId = req.params.userId;
+    console.log("Troggered!")
+
+    try {
+      // Find user by userId (replace this with your actual logic)
+      const user = await userModel.findById(userId);
+      console.log(user)
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // Toggle user status (example: invert the current status)
+      user.status = !user.status;
+  
+      // Save updated user status
+      await user.save();
+
+      console.log(user.status)
+  
+      // Send response
+      res.json({ message: 'User status updated successfully' });
+    } catch (error) {
+      console.error('Error toggling user status:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }  
 }
 
 exports.adminProducts = async (req, res) => {
@@ -85,7 +124,7 @@ exports.addproducts = async (req, res) => {
     try {
         const data = await Category.find({}).select('name');
         console.log(data)
-        res.render('addproducts', { data })
+        res.render('admin/addproducts', { data })
     } catch (err) {
         console.log(err)
         res.status(500).send(err)
@@ -100,7 +139,7 @@ exports.addProducts = (req, res) => {
         data.save()
             .then(() => {
                 console.log("product added")
-                res.send("product added")
+                res.redirect("/admin/products?msg=added");
             })
             .catch((err) => {
                 console.log("failed to add product ", err)
@@ -125,7 +164,7 @@ exports.addCategory = (req, res) => {
         data.save()
             .then(() => {
                 console.log("data saved to db");
-                res.send("data sent")
+                res.redirect('/admin/category?msg=added');
             })
             .catch((err) => {
                 console.log("data not saved to db", err)

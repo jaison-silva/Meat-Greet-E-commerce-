@@ -2,24 +2,27 @@ const express = require('express')
 const route = express.Router()
 const controller = require('../controllers/adminController')
 
+route.post('/login', controller.login);
+route.get('/logout', controller.logout);
 
-route.get('/manageUsers', controller.manageUsers)
+route.get('/users', controller.manageUsers)
 
-route.get('/adminCategory', controller.adminCategory)
-
-route.get('/adminProducts', controller.adminProducts)
+route.get('/products', controller.adminProducts);
+route.get('/category', controller.adminCategory)
 
 route.get('/addcategory', controller.addcategory)
 
 route.get('/addproducts', controller.addproducts)
 
-route.get('/adminCheck', controller.adminCheck)
-
 route.get('/adminLogin', controller.adminLogin)
+
+// route.get('/logout', controller.logout)
 
 ///API
 
-route.post('/api_addProducts',controller.addProducts)
-route.post('/api_addCategory',controller.addCategory)
+route.post('/usertoggle/:userId', controller.toggleUser);
+
+route.post('/addProducts',controller.addProducts)
+route.post('/addCategory',controller.addCategory)
 
 module.exports = route

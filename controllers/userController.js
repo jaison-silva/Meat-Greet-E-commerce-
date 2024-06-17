@@ -5,17 +5,24 @@ const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
 
 
-exports.api_login = async (req, res) => {
+exports.loginPage = (req, res) => {
+    res.render('user/login');
+}
 
-    let { email, password } = req.body
+exports.api_login = async (req, res) => {
+    let { email, password } = req.body;
+    console.log(email, password);
 
     try {
-        const data = await userModel.findOne({ email: email })
-        // console.log(data)
-        if (data.email == email && data.password == password) {
-            const token = {
-                email: email
-            }
+        const user = await userModel.findOne({ email: email });
+        console.log(user);
+
+        if (!user) {
+            return res.redirect('/user/login?msg=email'); // No user found with the given email
+        }
+
+        if (user.password === password) {
+            const token = { email: email };
             const userToken = jwt.sign(token, "secret_key", {
                 expiresIn: '4h'
             });
@@ -25,19 +32,28 @@ exports.api_login = async (req, res) => {
                 maxAge: 4 * 60 * 60 * 1000 // 4 hours in milliseconds
             });
 
-
-            res.render('index')
+            return res.redirect('/?msg=success');
         } else {
-            res.redirect('login')
+            return res.redirect('/user/login?msg=password'); // Password does not match
         }
     } catch (err) {
-        console.log(err)
-        res.status(500).send(err)
+        console.error('Error during login:', err);
+        return res.status(500).send('Internal Server Error');
+    }
+};
+
+exports.logout = async(req,res) => {
+    try{
+        res.clearCookie('userJwtAuth');
+        res.redirect('/?msg=loggedout');
+    }catch(e){  
+        console.log(e);
+        res.status(500).send("Error");
     }
 }
 
 exports.signup = (req, res) => {
-    res.render('signup')
+    res.render('user/signup')
 }
 
 exports.sendOtp = (req, res) => {
@@ -75,7 +91,7 @@ exports.sendOtp = (req, res) => {
                 res.status(500).json({ error: 'Failed to send OTP' }); // Send an error response
             } else {
                 // Store the OTP in session or database
-                res.cookie('otp', otp, { maxAge: 60000, httpOnly: true })
+                res.cookie('otp', otp, { maxAge: 30000, httpOnly: true })
                 res.json({ message: 'OTP sent successfully' }); // Send a success response
             }
         });
@@ -86,12 +102,12 @@ exports.sendOtp = (req, res) => {
 };
 
 exports.verifyOtp = (req, res) => {
-    let { otp } = req.body;
-    console.log('Triggered verifyOtp with OTP:', otp);
-
-    const storedOtp = req.cookies.otp;
-
     try {
+        let { otp } = req.body;
+        console.log('Triggered verifyOtp with OTP:', otp);
+
+        const storedOtp = req.cookies.otp;
+
         if (!storedOtp) {
             console.log('expired')
             return res.status(200).json({ message: "Expired" });
@@ -142,7 +158,11 @@ exports.registerUser = async (req, res) => {
 exports.category = async (req, res) => {
     try {
         const data = await Category.find()
-        res.render('category', { data })
+        if(req.cookies && req.cookies.userJwtAuth){
+            res.render('user/category', { data, user:true })
+        }else{
+            res.render('user/category', { data, user:false })
+        }
     } catch (err) {
         console.log(err)
         res.status(500).send(err)
@@ -153,7 +173,11 @@ exports.products = async (req, res) => {
     try {
         const data = await Product.find().populate('category')
         console.log(data);
-        res.render('products', { data })
+        if(req.cookies && req.cookies.userJwtAuth){
+            res.render('user/products', { data, user:true })
+        }else{
+            res.render('user/products', { data, user:false })
+        }
     } catch (err) {
         console.log(err)
         res.status(500).send(err)
@@ -163,7 +187,7 @@ exports.products = async (req, res) => {
 exports.cate_products = async (req, res) => {
     try {
         const data = await Product.find({ category: req.params.id }).populate('category')
-        res.render('products', { data })
+        res.render('user/products', { data })
     } catch (err) {
         console.log(err)
         res.status(500).send(err)
@@ -173,7 +197,7 @@ exports.cate_products = async (req, res) => {
 exports.productDetailed = async (req, res) => {
     try {
         // const data = Product.find({Category:req.params.id})
-        res.render('productDetailed')
+        res.render('user/productDetailed')
     } catch (err) {
         console.log(err)
         res.status(500).send(err)

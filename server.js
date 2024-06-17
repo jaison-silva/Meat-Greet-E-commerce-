@@ -5,14 +5,16 @@ const path = require('path')
 const dotenv = require('dotenv')
 const nocache = require('nocache')
 const mongoose = require('mongoose')
-const route = require('./routes/routes')
 const adminRoute = require('./routes/admin')
 const userRoute = require('./routes/user')
+const route = require('./routes/routes')
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
 const multer = require('multer')
+const controller = require('./controllers/controller');
 
 app.set('view engine', 'ejs')
+
 dotenv.config({ path: 'config.env' })
 
 //multer storage

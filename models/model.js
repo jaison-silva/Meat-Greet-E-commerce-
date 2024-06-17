@@ -31,7 +31,11 @@ const mongoose = require('mongoose');
       type: Number,
       required: true // Make name mandatory
     },
-    category: {
+    listing: {
+      type: Boolean,
+      default: true // Default value is true if not provided
+    },
+      category: {
       type: mongoose.Schema.Types.ObjectId,
       ref:'category',
       required: true // Make name mandatory
@@ -48,6 +52,11 @@ const mongoose = require('mongoose');
     description: {
       type: String,
       required: true // Make name mandatory
+    },
+    listing:{
+      type: Boolean,
+      default: true,
+      required: true
     },
     rate: {
       type: Number,
